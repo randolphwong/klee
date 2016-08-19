@@ -1451,6 +1451,20 @@ static inline const llvm::fltSemantics * fpWidthToSemantics(unsigned width) {
 
 void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
   Instruction *i = ki->inst;
+
+  static std::string previousBB = i->getParent()->getName().str();
+  std::string currentBB = i->getParent()->getName().str();
+  if (currentBB.find("entry") != std::string::npos)
+      currentBB = i->getParent()->getParent()->getName().str();
+
+  if (currentBB.find("block_") != std::string::npos ||
+          currentBB.find("sub_") != std::string::npos) {
+    if (previousBB != currentBB) {
+      llvm::errs() << "BB=^v=" << currentBB << "\n";
+      previousBB = currentBB;
+    }
+  }
+
   switch (i->getOpcode()) {
     // Control flow
   case Instruction::Ret: {
