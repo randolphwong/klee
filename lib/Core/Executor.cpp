@@ -394,11 +394,330 @@ Executor::~Executor() {
   }
 }
 
+std::map <std::string, int> function_list_gzip;
+std::map <std::string, int> function_list_man;
+std::map <std::string, int> function_list_bc;
+std::map <std::string, int> function_list_ncompress;
+std::map <std::string, int> function_list_poly;
+
 /***/
 
 void Executor::initializeGlobalObject(ExecutionState &state, ObjectState *os,
                                       const Constant *c, 
                                       unsigned offset) {
+  function_list_gzip["bi_init"] = 1;
+  function_list_gzip["send_bits"] = 1;
+  function_list_gzip["bi_reverse"] = 1;
+  function_list_gzip["bi_windup"] = 1;
+  function_list_gzip["copy_block"] = 1;
+  function_list_gzip["lm_init"] = 1;
+  function_list_gzip["longest_match"] = 1;
+  function_list_gzip["deflate"] = 1;
+  function_list_gzip["fill_window"] = 1;
+  function_list_gzip["deflate_fast"] = 1;
+  function_list_gzip["abort_gzip"] = 1;
+  function_list_gzip["do_exit"] = 1;
+  function_list_gzip["help"] = 1;
+  function_list_gzip["license"] = 1;
+  function_list_gzip["usage"] = 1;
+  function_list_gzip["version"] = 1;
+  function_list_gzip["treat_file"] = 1;
+  function_list_gzip["treat_stdin"] = 1;
+  function_list_gzip["do_list"] = 1;
+  function_list_gzip["get_method"] = 1;
+  function_list_gzip["copy_stat"] = 1;
+  function_list_gzip["reset_times"] = 1;
+  function_list_gzip["create_outfile"] = 1;
+  function_list_gzip["shorten_name"] = 1;
+  function_list_gzip["get_suffix"] = 1;
+  function_list_gzip["name_too_long"] = 1;
+  function_list_gzip["same_file"] = 1;
+  function_list_gzip["check_ofname"] = 1;
+  function_list_gzip["make_ofname"] = 1;
+  function_list_gzip["get_istat"] = 1;
+  function_list_gzip["do_stat"] = 1;
+  function_list_gzip["huft_build"] = 1;
+  function_list_gzip["huft_free"] = 1;
+  function_list_gzip["inflate_codes"] = 1;
+  function_list_gzip["inflate_stored"] = 1;
+  function_list_gzip["inflate_fixed"] = 1;
+  function_list_gzip["inflate_dynamic"] = 1;
+  function_list_gzip["inflate_block"] = 1;
+  function_list_gzip["inflate"] = 1;
+  function_list_gzip["lzw"] = 1;
+  function_list_gzip["ct_init"] = 1;
+  function_list_gzip["flush_block"] = 1;
+  function_list_gzip["ct_tally"] = 1;
+  function_list_gzip["gen_codes"] = 1;
+  function_list_gzip["init_block"] = 1;
+  function_list_gzip["set_file_type"] = 1;
+  function_list_gzip["build_tree"] = 1;
+  function_list_gzip["build_bl_tree"] = 1;
+  function_list_gzip["compress_block"] = 1;
+  function_list_gzip["send_all_trees"] = 1;
+  function_list_gzip["send_tree"] = 1;
+  function_list_gzip["scan_tree"] = 1;
+  function_list_gzip["gen_bitlen"] = 1;
+  function_list_gzip["pqdownheap"] = 1;
+  function_list_gzip["unlzh"] = 1;
+  function_list_gzip["decode_start"] = 1;
+  function_list_gzip["decode"] = 1;
+  function_list_gzip["decode_p"] = 1;
+  function_list_gzip["getbits"] = 1;
+  function_list_gzip["fillbuf"] = 1;
+  function_list_gzip["decode_c"] = 1;
+  function_list_gzip["read_c_len"] = 1;
+  function_list_gzip["make_table"] = 1;
+  function_list_gzip["read_pt_len"] = 1;
+  function_list_gzip["huf_decode_start"] = 1;
+  function_list_gzip["init_getbits"] = 1;
+  function_list_gzip["unlzw"] = 1;
+  function_list_gzip["unpack"] = 1;
+  function_list_gzip["read_tree"] = 1;
+  function_list_gzip["build_tree170"] = 1;
+  function_list_gzip["check_zipfile"] = 1;
+  function_list_gzip["unzip"] = 1;
+  function_list_gzip["copy"] = 1;
+  function_list_gzip["write_buf"] = 1;
+  function_list_gzip["read_error"] = 1;
+  function_list_gzip["updcrc"] = 1;
+  function_list_gzip["clear_bufs"] = 1;
+  function_list_gzip["fill_inbuf"] = 1;
+  function_list_gzip["flush_outbuf"] = 1;
+  function_list_gzip["flush_window"] = 1;
+  function_list_gzip["write_error"] = 1;
+  function_list_gzip["strlwr"] = 1;
+  function_list_gzip["basename"] = 1;
+  function_list_gzip["make_simple_name"] = 1;
+  function_list_gzip["add_envopt"] = 1;
+  function_list_gzip["xmalloc"] = 1;
+  function_list_gzip["error"] = 1;
+  function_list_gzip["warn"] = 1;
+  function_list_gzip["display_ratio"] = 1;
+  function_list_gzip["zip"] = 1;
+  function_list_gzip["file_read"] = 1;
+  function_list_gzip["__user_main"] = 1;
+
+  function_list_man["__user_main"] = 1;
+  function_list_man["get_line_length"] = 1;
+  function_list_man["get_section_list"] = 1;
+  function_list_man["is_section"] = 1;
+  function_list_man["do_global_apropos"] = 1;
+  function_list_man["do_apropos"] = 1;
+  function_list_man["do_whatis"] = 1;
+  function_list_man["man"] = 1;
+  function_list_man["display_cat_file"] = 1;
+  function_list_man["format_and_display"] = 1;
+  function_list_man["make_and_display_cat_file"] = 1;
+  function_list_man["remove_other_catfiles"] = 1;
+  function_list_man["remove_file"] = 1;
+  function_list_man["make_cat_file"] = 1;
+  function_list_man["make_roff_command"] = 1;
+  function_list_man["parse_roff_directive"] = 1;
+  function_list_man["add_directive"] = 1;
+  function_list_man["eos"] = 1;
+  function_list_man["setpl"] = 1;
+  function_list_man["setll"] = 1;
+  function_list_man["display_man_file"] = 1;
+  function_list_man["ultimate_source"] = 1;
+  function_list_man["manfile"] = 1;
+  function_list_man["manfile_from_section"] = 1;
+  function_list_man["append"] = 1;
+  function_list_man["manfile_from_sec_and_dir"] = 1;
+  function_list_man["glob_for_file"] = 1;
+  function_list_man["glob_for_file_ext"] = 1;
+  function_list_man["glob_for_file_ext_glob"] = 1;
+  function_list_man["my_lth"] = 1;
+  function_list_man["init_manpath"] = 1;
+  function_list_man["prmanpath"] = 1;
+  function_list_man["to_mandirlist"] = 1;
+  function_list_man["split"] = 1;
+  function_list_man["add_default_manpath"] = 1;
+  function_list_man["get_manpath_from_pathdir"] = 1;
+  function_list_man["find_man_subdir"] = 1;
+  function_list_man["is_directory"] = 1;
+  function_list_man["add_to_mandirlist"] = 1;
+  function_list_man["add_to_mandirlist_x"] = 1;
+  function_list_man["split2"] = 1;
+  function_list_man["add_to_list"] = 1;
+  function_list_man["getval"] = 1;
+  function_list_man["get_expander"] = 1;
+  function_list_man["read_config_file"] = 1;
+  function_list_man["adddir"] = 1;
+  function_list_man["addext"] = 1;
+  function_list_man["addval"] = 1;
+  function_list_man["man_getopt"] = 1;
+  function_list_man["print_version"] = 1;
+  function_list_man["usage"] = 1;
+  function_list_man["mandir_of"] = 1;
+  function_list_man["convert_to_cat"] = 1;
+  function_list_man["mantail_of"] = 1;
+  function_list_man["different_cat_file"] = 1;
+  function_list_man["different_man_file"] = 1;
+  function_list_man["is_different"] = 1;
+  function_list_man["gripe"] = 1;
+  function_list_man["fatal"] = 1;
+  function_list_man["getmsg"] = 1;
+  function_list_man["catinit"] = 1;
+  function_list_man["my_catopen"] = 1;
+  function_list_man["my_catopenpath"] = 1;
+  function_list_man["glob_pattern_p"] = 1;
+  function_list_man["glob_match"] = 1;
+  function_list_man["glob_vector"] = 1;
+  function_list_man["glob_filename"] = 1;
+  function_list_man["glob_match_after_star"] = 1;
+  function_list_man["glob_dir_to_array"] = 1;
+  function_list_man["mkprogname"] = 1;
+  function_list_man["my_strdup"] = 1;
+  function_list_man["is_newer"] = 1;
+  function_list_man["get_permissions"] = 1;
+  function_list_man["no_privileges"] = 1;
+  function_list_man["my_popen"] = 1;
+  function_list_man["do_system_command"] = 1;
+  function_list_man["my_malloc"] = 1;
+  function_list_man["my_system"] = 1;
+  function_list_man["system1"] = 1;
+  function_list_man["system0"] = 1;
+  function_list_man["catch_int"] = 1;
+
+  function_list_bc["__user_main"] = 1;
+  function_list_bc["usage"] = 1;
+  function_list_bc["parse_args"] = 1;
+  function_list_bc["use_quit"] = 1;
+  function_list_bc["open_new_file"] = 1;
+  function_list_bc["new_yy_file"] = 1;
+  function_list_bc["yyparse"] = 1;
+  function_list_bc["yylex"] = 1;
+  function_list_bc["yy_create_buffer"] = 1;
+  function_list_bc["yy_load_buffer_state"] = 1;
+  function_list_bc["yywrap"] = 1;
+  function_list_bc["yyrestart"] = 1;
+  function_list_bc["yy_init_buffer"] = 1;
+  function_list_bc["yy_switch_to_buffer"] = 1;
+  function_list_bc["yy_delete_buffer"] = 1;
+  function_list_bc["yy_flush_buffer"] = 1;
+  function_list_bc["yy_scan_buffer"] = 1;
+  function_list_bc["yy_scan_string"] = 1;
+  function_list_bc["yy_scan_bytes"] = 1;
+  function_list_bc["input"] = 1;
+  function_list_bc["yy_get_next_buffer"] = 1;
+  function_list_bc["yy_fatal_error"] = 1;
+  function_list_bc["stop_execution"] = 1;
+  function_list_bc["byte"] = 1;
+  function_list_bc["execute"] = 1;
+  function_list_bc["push_b10_const"] = 1;
+  function_list_bc["push_constant"] = 1;
+  function_list_bc["prog_char"] = 1;
+  function_list_bc["assign"] = 1;
+  function_list_bc["input_char"] = 1;
+  function_list_bc["init_load"] = 1;
+  function_list_bc["addbyte"] = 1;
+  function_list_bc["def_label"] = 1;
+  function_list_bc["long_val"] = 1;
+  function_list_bc["load_code"] = 1;
+  function_list_bc["init_storage"] = 1;
+  function_list_bc["more_functions"] = 1;
+  function_list_bc["more_variables"] = 1;
+  function_list_bc["more_arrays"] = 1;
+  function_list_bc["clear_func"] = 1;
+  function_list_bc["fpop"] = 1;
+  function_list_bc["fpush"] = 1;
+  function_list_bc["pop"] = 1;
+  function_list_bc["push_copy"] = 1;
+  function_list_bc["push_num"] = 1;
+  function_list_bc["check_stack"] = 1;
+  function_list_bc["get_var"] = 1;
+  function_list_bc["get_array_num"] = 1;
+  function_list_bc["store_var"] = 1;
+  function_list_bc["store_array"] = 1;
+  function_list_bc["load_var"] = 1;
+  function_list_bc["load_array"] = 1;
+  function_list_bc["decr_var"] = 1;
+  function_list_bc["decr_array"] = 1;
+  function_list_bc["incr_var"] = 1;
+  function_list_bc["incr_array"] = 1;
+  function_list_bc["auto_var"] = 1;
+  function_list_bc["free_a_tree"] = 1;
+  function_list_bc["pop_vars"] = 1;
+  function_list_bc["copy_tree"] = 1;
+  function_list_bc["copy_array"] = 1;
+  function_list_bc["process_params"] = 1;
+  function_list_bc["strcopyof"] = 1;
+  function_list_bc["bc_malloc"] = 1;
+  function_list_bc["nextarg"] = 1;
+  function_list_bc["arg_str"] = 1;
+  function_list_bc["call_str"] = 1;
+  function_list_bc["free_args"] = 1;
+  function_list_bc["check_params"] = 1;
+  function_list_bc["yyerror"] = 1;
+  function_list_bc["warn"] = 1;
+  function_list_bc["init_gen"] = 1;
+  function_list_bc["generate"] = 1;
+  function_list_bc["run_code"] = 1;
+  function_list_bc["out_char"] = 1;
+  function_list_bc["out_schar"] = 1;
+  function_list_bc["find_id"] = 1;
+  function_list_bc["insert_id_rec"] = 1;
+  function_list_bc["init_tree"] = 1;
+  function_list_bc["lookup"] = 1;
+  function_list_bc["welcome"] = 1;
+  function_list_bc["show_bc_version"] = 1;
+  function_list_bc["warranty"] = 1;
+  function_list_bc["limits"] = 1;
+  function_list_bc["out_of_memory"] = 1;
+  function_list_bc["rt_error"] = 1;
+  function_list_bc["rt_warn"] = 1;
+  function_list_bc["make_arg_str"] = 1;
+  function_list_bc["bc_new_num"] = 1;
+  function_list_bc["bc_free_num"] = 1;
+  function_list_bc["bc_init_numbers"] = 1;
+  function_list_bc["bc_copy_num"] = 1;
+  function_list_bc["bc_init_num"] = 1;
+  function_list_bc["bc_compare"] = 1;
+  function_list_bc["bc_is_neg"] = 1;
+  function_list_bc["bc_is_zero"] = 1;
+  function_list_bc["bc_is_near_zero"] = 1;
+  function_list_bc["bc_sub"] = 1;
+  function_list_bc["bc_add"] = 1;
+  function_list_bc["bc_multiply"] = 1;
+  function_list_bc["bc_divide"] = 1;
+  function_list_bc["bc_divmod"] = 1;
+  function_list_bc["bc_modulo"] = 1;
+  function_list_bc["bc_raisemod"] = 1;
+  function_list_bc["bc_raise"] = 1;
+  function_list_bc["bc_num2long"] = 1;
+  function_list_bc["bc_sqrt"] = 1;
+  function_list_bc["bc_int2num"] = 1;
+  function_list_bc["bc_out_long"] = 1;
+  function_list_bc["bc_out_num"] = 1;
+  function_list_bc["num2str"] = 1;
+  function_list_bc["bc_str2num"] = 1;
+  function_list_bc["pn"] = 1;
+  function_list_bc["pv"] = 1;
+  function_list_bc["_bc_do_compare"] = 1;
+  function_list_bc["_bc_do_add"] = 1;
+  function_list_bc["_bc_do_sub"] = 1;
+  function_list_bc["_bc_rec_mul"] = 1;
+  function_list_bc["_bc_shift_addsub"] = 1;
+
+  function_list_poly["__user_main"] = 1;
+  function_list_poly["grok_commandLine"] = 1;
+  function_list_poly["convert_fileName"] = 1;
+  function_list_poly["is_fileHidden"] = 1;
+  function_list_poly["does_nameHaveUppers"] = 1;
+  function_list_poly["does_newnameExist"] = 1;
+
+  function_list_ncompress["__user_main"] = 1;
+  function_list_ncompress["abort_compress"] = 1;
+  function_list_ncompress["about"] = 1;
+  function_list_ncompress["Usage"] = 1;
+  function_list_ncompress["comprexx"] = 1;
+  function_list_ncompress["compress"] = 1;
+  function_list_ncompress["prratio"] = 1;
+  function_list_ncompress["decompress"] = 1;
+  function_list_ncompress["write_error"] = 1;
+  function_list_ncompress["read_error"] = 1;
+
 #if LLVM_VERSION_CODE <= LLVM_VERSION(3, 1)
   TargetData *targetData = kmodule->targetData;
 #else
@@ -1452,18 +1771,45 @@ static inline const llvm::fltSemantics * fpWidthToSemantics(unsigned width) {
 void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
   Instruction *i = ki->inst;
 
-  static std::string previousBB = i->getParent()->getName().str();
-  std::string currentBB = i->getParent()->getName().str();
-  if (currentBB.find("entry") != std::string::npos)
-      currentBB = i->getParent()->getParent()->getName().str();
+/*
+ *  std::map <std::string, int> function_list;
+ *  static BasicBlock *previousBB = i->getParent();
+ *  BasicBlock *currentBB = i->getParent();
+ *  std::string moduleName = currentBB->getParent()->getParent()->getModuleIdentifier();
+ *  if (moduleName.find("bc.bc") != std::string::npos)
+ *      function_list = function_list_bc;
+ *  else if (moduleName.find("compress42.bc") != std::string::npos)
+ *      function_list = function_list_ncompress;
+ *  else if (moduleName.find("gzip.bc") != std::string::npos)
+ *      function_list = function_list_gzip;
+ *  else if (moduleName.find("polymorph.bc") != std::string::npos)
+ *      function_list = function_list_poly;
+ *  else if (moduleName.find("man") != std::string::npos)
+ *      function_list = function_list_man;
+ *
+ *  if (previousBB != currentBB) {
+ *    if (function_list.find(currentBB->getParent()->getName().str()) != function_list.end()) {
+ *      llvm::errs() << "function " << currentBB->getParent()->getName() << ": ";
+ *      llvm::errs() << "BB=^v=" << currentBB << "-" << currentBB->getName() << "\n";
+ *      previousBB = currentBB;
+ *    }
+ *  }
+ */
 
-  if (currentBB.find("block_") != std::string::npos ||
-          currentBB.find("sub_") != std::string::npos) {
-    if (previousBB != currentBB) {
-      llvm::errs() << "BB=^v=" << currentBB << "\n";
-      previousBB = currentBB;
-    }
-  }
+/*
+ *  static std::string previousBB = i->getParent()->getName().str();
+ *  std::string currentBB = i->getParent()->getName().str();
+ *  if (currentBB.find("entry") != std::string::npos)
+ *      currentBB = i->getParent()->getParent()->getName().str();
+ *
+ *  if (currentBB.find("block_") != std::string::npos ||
+ *          currentBB.find("sub_") != std::string::npos) {
+ *    if (previousBB != currentBB) {
+ *      llvm::errs() << "BB=^v=" << currentBB << "\n";
+ *      previousBB = currentBB;
+ *    }
+ *  }
+ */
 
   switch (i->getOpcode()) {
     // Control flow
