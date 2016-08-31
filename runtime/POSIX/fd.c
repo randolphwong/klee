@@ -332,6 +332,69 @@ int close(int fd) {
   return r;
 }
 
+char *my_getenv_256(char *name) {
+  char symbolic_name[40] = {0};
+  if (!klee_is_symbolic((unsigned long) *name)) {
+    sprintf(symbolic_name, "getenv_%s", name);
+  } else {
+    sprintf(symbolic_name, "getenv_%s", "a");
+  }
+  klee_warning("Using self-implemented getenv");
+  char *tmp = malloc(256);
+  klee_make_symbolic(tmp, 256, symbolic_name);
+  return tmp;
+}
+
+char *my_getenv_1024(char *name) {
+  char symbolic_name[40] = {0};
+  if (!klee_is_symbolic((unsigned long) *name)) {
+    sprintf(symbolic_name, "getenv_%s", name);
+  } else {
+    sprintf(symbolic_name, "getenv_%s", "a");
+  }
+  klee_warning("Using self-implemented getenv");
+  char *tmp = malloc(1024);
+  klee_make_symbolic(tmp, 1024, symbolic_name);
+  return tmp;
+}
+
+char *my_getenv_4096(char *name) {
+  char symbolic_name[40] = {0};
+  if (!klee_is_symbolic((unsigned long) *name)) {
+    sprintf(symbolic_name, "getenv_%s", name);
+  } else {
+    sprintf(symbolic_name, "getenv_%s", "a");
+  }
+  klee_warning("Using self-implemented getenv");
+  char *tmp = malloc(4096);
+  klee_make_symbolic(tmp, 4096, symbolic_name);
+  return tmp;
+}
+
+void my_scanf(const char *format, int *a) {
+  /*
+   *switch (format[1]) {
+   *  case 'a': puts("a is 1"); break;
+   *  case 'b': puts("a is 2"); break;
+   *  case 'c': puts("a is 3"); break;
+   *  case 'd': puts("a is 4"); break;
+   *  case 'e': puts("a is 5"); break;
+   *  default: puts("a is ??");
+   *}
+   */
+  /*klee_make_symbolic(a, sizeof *a, "my_scanf_a");*/
+  if (!klee_is_symbolic((unsigned long) *format)) {
+    klee_warning("Using sscanf from libc");
+    sscanf(format, "%d", a);
+    return;
+  }
+
+  klee_warning("Using self-implemented sscanf");
+  int *tmp = malloc(sizeof(int));
+  klee_make_symbolic(tmp, sizeof *tmp, "my_scanf_a");
+  memcpy(a, tmp, sizeof *a);
+}
+
 ssize_t read(int fd, void *buf, size_t count) {
   static int n_calls = 0;
   exe_file_t *f;
