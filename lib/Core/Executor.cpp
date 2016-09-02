@@ -1074,7 +1074,7 @@ Executor::fork(ExecutionState &current, ref<Expr> condition, bool isInternal) {
       assert(replayPosition<replayPath->size() &&
              "ran out of branches in replay path mode");
       bool branch = (*replayPath)[replayPosition++];
-      
+
       if (res==Solver::True) {
         assert(branch && "hit invalid branch in replay path mode");
       } else if (res==Solver::False) {
@@ -1091,20 +1091,20 @@ Executor::fork(ExecutionState &current, ref<Expr> condition, bool isInternal) {
       }
     } else if (res==Solver::Unknown) {
       assert(!replayKTest && "in replay mode, only one branch can be true.");
-      
+
       if ((MaxMemoryInhibit && atMemoryLimit) || 
           current.forkDisabled ||
           inhibitForking || 
           (MaxForks!=~0u && stats::forks >= MaxForks)) {
 
-	if (MaxMemoryInhibit && atMemoryLimit)
-	  klee_warning_once(0, "skipping fork (memory cap exceeded)");
-	else if (current.forkDisabled)
-	  klee_warning_once(0, "skipping fork (fork disabled on current path)");
-	else if (inhibitForking)
-	  klee_warning_once(0, "skipping fork (fork disabled globally)");
-	else 
-	  klee_warning_once(0, "skipping fork (max-forks reached)");
+       if (MaxMemoryInhibit && atMemoryLimit)
+         klee_warning_once(0, "skipping fork (memory cap exceeded)");
+       else if (current.forkDisabled)
+         klee_warning_once(0, "skipping fork (fork disabled on current path)");
+       else if (inhibitForking)
+         klee_warning_once(0, "skipping fork (fork disabled globally)");
+       else
+         klee_warning_once(0, "skipping fork (max-forks reached)");
 
         TimerStatIncrementer timer(stats::forkTime);
         if (theRNG.getBool()) {
@@ -1142,7 +1142,7 @@ Executor::fork(ExecutionState &current, ref<Expr> condition, bool isInternal) {
     }
     if (!(trueSeed && falseSeed)) {
       assert(trueSeed || falseSeed);
-      
+
       res = trueSeed ? Solver::True : Solver::False;
       addConstraint(current, trueSeed ? condition : Expr::createIsZero(condition));
     }
@@ -1202,7 +1202,7 @@ Executor::fork(ExecutionState &current, ref<Expr> condition, bool isInternal) {
           falseSeeds.push_back(*siit);
         }
       }
-      
+
       bool swapInfo = false;
       if (trueSeeds.empty()) {
         if (&current == trueState) swapInfo = true;
@@ -1771,41 +1771,40 @@ static inline const llvm::fltSemantics * fpWidthToSemantics(unsigned width) {
 void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
   Instruction *i = ki->inst;
 
-/*
- *  std::map <std::string, int> function_list;
- *  static BasicBlock *previousBB = i->getParent();
- *  BasicBlock *currentBB = i->getParent();
- *  std::string moduleName = currentBB->getParent()->getParent()->getModuleIdentifier();
- *  if (moduleName.find("bc.bc") != std::string::npos)
- *      function_list = function_list_bc;
- *  else if (moduleName.find("compress42.bc") != std::string::npos)
- *      function_list = function_list_ncompress;
- *  else if (moduleName.find("gzip.bc") != std::string::npos)
- *      function_list = function_list_gzip;
- *  else if (moduleName.find("polymorph.bc") != std::string::npos)
- *      function_list = function_list_poly;
- *  else if (moduleName.find("man") != std::string::npos)
- *      function_list = function_list_man;
- *
- *  if (previousBB != currentBB) {
- *    if (function_list.find(currentBB->getParent()->getName().str()) != function_list.end()) {
- *      llvm::errs() << "function " << currentBB->getParent()->getName() << ": ";
- *      llvm::errs() << "BB=^v=" << currentBB << "-" << currentBB->getName() << "\n";
- *      previousBB = currentBB;
- *    }
- *  }
- */
+  std::map <std::string, int> function_list;
+  static BasicBlock *previousBB = i->getParent();
+  BasicBlock *currentBB = i->getParent();
+  std::string moduleName = currentBB->getParent()->getParent()->getModuleIdentifier();
+  if (moduleName.find("bc.bc") != std::string::npos)
+      function_list = function_list_bc;
+  else if (moduleName.find("compress42.bc") != std::string::npos)
+      function_list = function_list_ncompress;
+  else if (moduleName.find("gzip.bc") != std::string::npos)
+      function_list = function_list_gzip;
+  else if (moduleName.find("polymorph.bc") != std::string::npos)
+      function_list = function_list_poly;
+  else if (moduleName.find("man") != std::string::npos)
+      function_list = function_list_man;
+
+  if (previousBB != currentBB) {
+    if (function_list.find(currentBB->getParent()->getName().str()) != function_list.end()) {
+      llvm::errs() << "function " << currentBB->getParent()->getName() << ": ";
+      llvm::errs() << "BB=^v=" << state.depth << ":" << currentBB << "-" << currentBB->getName() << "\n";
+      previousBB = currentBB;
+    }
+  }
 
 /*
  *  static std::string previousBB = i->getParent()->getName().str();
  *  std::string currentBB = i->getParent()->getName().str();
+ *
  *  if (currentBB.find("entry") != std::string::npos)
  *      currentBB = i->getParent()->getParent()->getName().str();
  *
  *  if (currentBB.find("block_") != std::string::npos ||
  *          currentBB.find("sub_") != std::string::npos) {
  *    if (previousBB != currentBB) {
- *      llvm::errs() << "BB=^v=" << currentBB << "\n";
+ *      llvm::errs() << "BB=^v=" << state.depth << ":" << currentBB << "\n";
  *      previousBB = currentBB;
  *    }
  *  }
@@ -1911,6 +1910,7 @@ void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
       assert(bi->getCondition() == bi->getOperand(0) &&
              "Wrong operand index!");
       ref<Expr> cond = eval(ki, 0, state).value;
+      //unsigned curr_depth = state.depth;
       Executor::StatePair branches = fork(state, cond, false);
 
       // NOTE: There is a hidden dependency here, markBranchVisited
@@ -1919,6 +1919,18 @@ void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
       // up with convenient instruction specific data.
       if (statsTracker && state.stack.back().kf->trackCoverage)
         statsTracker->markBranchVisited(branches.first, branches.second);
+
+      /*
+       *if (branches.first && branches.second) {
+       *  if ((branches.first->depth > curr_depth) && (branches.second->depth > curr_depth)) {
+       *    llvm::errs() << "function " << "(" << curr_depth << "): " <<
+       *        bi->getParent()->getParent()->getName().str() << " ";
+       *    llvm::errs() << bi->getParent()->getName().str() << ": [" << 
+       *       bi->getSuccessor(0)->getName().str() << ", " << 
+       *       bi->getSuccessor(1)->getName().str() << "]\n";
+       *  }
+       *}
+       */
 
       if (branches.first)
         transferToBasicBlock(bi->getSuccessor(0), bi->getParent(), *branches.first);
