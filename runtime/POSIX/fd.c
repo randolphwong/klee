@@ -332,6 +332,34 @@ int close(int fd) {
   return r;
 }
 
+/**
+ * returns concrete only if name is concrete and environment 
+ * variable != "klee_make_symbolic"
+ */
+char *my_getenv(char *name) {
+  char symbolic_name[80] = {0};
+  char *env_var;
+  int ret_symbolic = 0;
+
+  if (!klee_is_symbolic((unsigned long) *name)) {
+    sprintf(symbolic_name, "getenv_%s", name);
+    env_var = getenv(name);
+    if (env_var && !strncmp(env_var, "klee_make_symbolic", 18))
+      ret_symbolic = 1;
+  } else {
+    sprintf(symbolic_name, "getenv_%s", "a");
+    ret_symbolic = 1;
+  }
+
+  if (!ret_symbolic)
+      return env_var;
+
+  klee_warning("Using self-implemented getenv, returning 10000b symbolic");
+  char *tmp = malloc(10000);
+  klee_make_symbolic(tmp, 10000, symbolic_name);
+  return tmp;
+}
+
 char *my_getenv_256(char *name) {
   char symbolic_name[40] = {0};
   if (!klee_is_symbolic((unsigned long) *name)) {
