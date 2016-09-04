@@ -483,8 +483,11 @@ ref<Expr> ObjectState::read(ref<Expr> offset, Expr::Width width) const {
 
 ref<Expr> ObjectState::read(unsigned offset, Expr::Width width) const {
   // Treat bool specially, it is the only non-byte sized write we allow.
-  if (width == Expr::Bool)
+  if (width == Expr::Bool) {
     return ExtractExpr::create(read8(offset), 0, Expr::Bool);
+  } else if (width < 8) {
+    return ExtractExpr::create(read8(offset), 0, width);
+  }
 
   // Otherwise, follow the slow general case.
   unsigned NumBytes = width / 8;
@@ -534,8 +537,10 @@ void ObjectState::write(unsigned offset, ref<Expr> value) {
       uint64_t val = CE->getZExtValue();
       switch (w) {
       default: assert(0 && "Invalid write size!");
+      case 2:
+      case 4: write8(offset, ZExtExpr::create(value, w)); return;
       case  Expr::Bool:
-      case  Expr::Int8:  write8(offset, val); return;
+      case Expr::Int8:  write8(offset, val); return;
       case Expr::Int16: write16(offset, val); return;
       case Expr::Int32: write32(offset, val); return;
       case Expr::Int64: write64(offset, val); return;
@@ -547,6 +552,9 @@ void ObjectState::write(unsigned offset, ref<Expr> value) {
   Expr::Width w = value->getWidth();
   if (w == Expr::Bool) {
     write8(offset, ZExtExpr::create(value, Expr::Int8));
+    return;
+  } else if (w < 8) {
+    write8(offset, ZExtExpr::create(value, w));
     return;
   }
 
