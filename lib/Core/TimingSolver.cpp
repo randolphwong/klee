@@ -32,6 +32,8 @@ bool TimingSolver::evaluate(const ExecutionState& state, ref<Expr> expr,
     return true;
   }
 
+  state.queryCount++;
+
   sys::TimeValue now = util::getWallTimeVal();
 
   if (simplifyExprs)

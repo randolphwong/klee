@@ -102,6 +102,9 @@ public:
   /// @brief Costs for all queries issued for this state, in seconds
   mutable double queryCost;
 
+  /// @brief Number of queries to the solver
+  mutable unsigned queryCount;
+
   /// @brief Weight assigned for importance of this state.  Can be
   /// used for searchers to decide what paths to explore
   double weight;
@@ -129,6 +132,9 @@ public:
 
   /// @brief Set containing which lines in which files are covered by this state
   std::map<const std::string *, std::set<unsigned> > coveredLines;
+  
+  /// @brief Set containing the time spent in solver for each fork
+  std::map<const std::string, double> coveredBranches;
 
   /// @brief Pointer to the process tree of the current state
   PTreeNode *ptreeNode;

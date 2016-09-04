@@ -71,6 +71,7 @@ ExecutionState::ExecutionState(KFunction *kf) :
     prevPC(pc),
 
     queryCost(0.), 
+    queryCount(0), 
     weight(1),
     depth(0),
 
@@ -82,7 +83,7 @@ ExecutionState::ExecutionState(KFunction *kf) :
 }
 
 ExecutionState::ExecutionState(const std::vector<ref<Expr> > &assumptions)
-    : constraints(assumptions), queryCost(0.), ptreeNode(0) {}
+    : constraints(assumptions), queryCost(0.), queryCount(0), ptreeNode(0) {}
 
 ExecutionState::~ExecutionState() {
   for (unsigned int i=0; i<symbolics.size(); i++)
@@ -108,6 +109,7 @@ ExecutionState::ExecutionState(const ExecutionState& state):
     constraints(state.constraints),
 
     queryCost(state.queryCost),
+    queryCount(state.queryCount),
     weight(state.weight),
     depth(state.depth),
 
@@ -118,6 +120,7 @@ ExecutionState::ExecutionState(const ExecutionState& state):
     coveredNew(state.coveredNew),
     forkDisabled(state.forkDisabled),
     coveredLines(state.coveredLines),
+    coveredBranches(state.coveredBranches),
     ptreeNode(state.ptreeNode),
     symbolics(state.symbolics),
     arrayNames(state.arrayNames)

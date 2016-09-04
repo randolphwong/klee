@@ -770,7 +770,22 @@ Executor::fork(ExecutionState &current, ref<Expr> condition, bool isInternal) {
   if (isSeeding)
     timeout *= it->second.size();
   solver->setTimeout(timeout);
+
+  double queryCostDelta = current.queryCost;
+  unsigned queryCount = current.queryCount;
+
   bool success = solver->evaluate(current, condition, res);
+
+  //if (current.queryCount > queryCount) {
+    queryCostDelta = current.queryCost - queryCostDelta;
+    std::string functionName = current.prevPC->inst->getParent()->getParent()
+                                                                ->getName()
+                                                                .str();
+    llvm::raw_string_ostream os(functionName);
+    current.prevPC->inst->print(os);
+    current.coveredBranches[functionName] += queryCostDelta;
+  //}
+
   solver->setTimeout(0);
   if (!success) {
     current.pc = current.prevPC;
@@ -1489,6 +1504,7 @@ static inline const llvm::fltSemantics * fpWidthToSemantics(unsigned width) {
 
 void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
   Instruction *i = ki->inst;
+
   switch (i->getOpcode()) {
     // Control flow
   case Instruction::Ret: {

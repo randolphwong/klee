@@ -489,6 +489,18 @@ void KleeHandler::processTestCase(const ExecutionState &state,
       delete f;
     }
 
+    llvm::raw_ostream *f = openTestFile("query", id);
+    *f << "depth: " << state.depth << "\n";
+    *f << "total queries: " << state.queryCount << "\n";
+    *f << "total query time in seconds: " << state.queryCost << "\n";
+    std::map<const std::string, double> covB = state.coveredBranches;
+    for (std::map<const std::string, double>::iterator
+           it = covB.begin(), ie = covB.end();
+         it != ie; ++it) {
+      *f << it->first << ":" << it->second << "\n";
+    }
+    delete f;
+
     if (WriteCVCs) {
       // FIXME: If using Z3 as the core solver the emitted file is actually
       // SMT-LIBv2 not CVC which is a bit confusing
