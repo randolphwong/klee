@@ -394,6 +394,7 @@ Executor::~Executor() {
   }
 }
 
+std::map <std::string, int> function_list_mkdir;
 std::map <std::string, int> function_list_gzip;
 std::map <std::string, int> function_list_man;
 std::map <std::string, int> function_list_bc;
@@ -405,6 +406,64 @@ std::map <std::string, int> function_list_poly;
 void Executor::initializeGlobalObject(ExecutionState &state, ObjectState *os,
                                       const Constant *c, 
                                       unsigned offset) {
+
+  function_list_mkdir["__user_main"] = 1;
+  function_list_mkdir["usage"] = 1;
+  function_list_mkdir["make_ancestor"] = 1;
+  function_list_mkdir["process_dir"] = 1;
+  function_list_mkdir["announce_mkdir"] = 1;
+  function_list_mkdir["savewd_chdir"] = 1;
+  function_list_mkdir["savewd_restore"] = 1;
+  function_list_mkdir["savewd_finish"] = 1;
+  function_list_mkdir["savewd_process_files"] = 1;
+  function_list_mkdir["version_etc_va"] = 1;
+  function_list_mkdir["version_etc"] = 1;
+  function_list_mkdir["close_stdout_set_file_name"] = 1;
+  function_list_mkdir["close_stdout"] = 1;
+  function_list_mkdir["make_dir_parents"] = 1;
+  function_list_mkdir["mode_compile"] = 1;
+  function_list_mkdir["mode_create_from_ref"] = 1;
+  function_list_mkdir["mode_adjust"] = 1;
+  function_list_mkdir["open_safer"] = 1;
+  function_list_mkdir["quote_n"] = 1;
+  function_list_mkdir["quote"] = 1;
+  function_list_mkdir["clone_quoting_options"] = 1;
+  function_list_mkdir["get_quoting_style"] = 1;
+  function_list_mkdir["set_quoting_style"] = 1;
+  function_list_mkdir["set_char_quoting"] = 1;
+  function_list_mkdir["quotearg_buffer"] = 1;
+  function_list_mkdir["quotearg_alloc"] = 1;
+  function_list_mkdir["quotearg_free"] = 1;
+  function_list_mkdir["quotearg_n"] = 1;
+  function_list_mkdir["quotearg"] = 1;
+  function_list_mkdir["quotearg_n_style"] = 1;
+  function_list_mkdir["quotearg_n_style_mem"] = 1;
+  function_list_mkdir["quotearg_style"] = 1;
+  function_list_mkdir["quotearg_char"] = 1;
+  function_list_mkdir["quotearg_colon"] = 1;
+  function_list_mkdir["quotearg_buffer_restyled"] = 1;
+  function_list_mkdir["quotearg_n_options"] = 1;
+  function_list_mkdir["rpl_vfprintf"] = 1;
+  function_list_mkdir["xmalloc"] = 1;
+  function_list_mkdir["xrealloc"] = 1;
+  function_list_mkdir["x2realloc"] = 1;
+  function_list_mkdir["xzalloc"] = 1;
+  function_list_mkdir["xcalloc"] = 1;
+  function_list_mkdir["xmemdup"] = 1;
+  function_list_mkdir["xstrdup"] = 1;
+  function_list_mkdir["fseterr"] = 1;
+  function_list_mkdir["xalloc_die"] = 1;
+  function_list_mkdir["rpl_calloc"] = 1;
+  function_list_mkdir["close_stream"] = 1;
+  function_list_mkdir["dirchownmod"] = 1;
+  function_list_mkdir["fd_safer"] = 1;
+  function_list_mkdir["mkancesdirs"] = 1;
+  function_list_mkdir["vasnprintf"] = 1;
+  function_list_mkdir["dup_safer"] = 1;
+  function_list_mkdir["rpl_isnanl"] = 1;
+  function_list_mkdir["printf_fetchargs"] = 1;
+  function_list_mkdir["printf_parse"] = 1;
+
   function_list_gzip["bi_init"] = 1;
   function_list_gzip["send_bits"] = 1;
   function_list_gzip["bi_reverse"] = 1;
@@ -1785,6 +1844,8 @@ void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
       function_list = function_list_poly;
   else if (moduleName.find("man") != std::string::npos)
       function_list = function_list_man;
+  else if (moduleName.find("mkdir") != std::string::npos)
+      function_list = function_list_mkdir;
 
   if (previousBB != currentBB) {
     if (function_list.find(currentBB->getParent()->getName().str()) != function_list.end()) {
@@ -1794,21 +1855,19 @@ void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
     }
   }
 
-/*
- *  static std::string previousBB = i->getParent()->getName().str();
- *  std::string currentBB = i->getParent()->getName().str();
- *
- *  if (currentBB.find("entry") != std::string::npos)
- *      currentBB = i->getParent()->getParent()->getName().str();
- *
- *  if (currentBB.find("block_") != std::string::npos ||
- *          currentBB.find("sub_") != std::string::npos) {
- *    if (previousBB != currentBB) {
- *      llvm::errs() << "BB=^v=" << state.depth << ":" << currentBB << "\n";
- *      previousBB = currentBB;
- *    }
- *  }
- */
+  //static std::string previousBB = i->getParent()->getName().str();
+  //std::string currentBB = i->getParent()->getName().str();
+
+  //if (currentBB.find("entry") != std::string::npos)
+      //currentBB = i->getParent()->getParent()->getName().str();
+
+  //if (currentBB.find("block_") != std::string::npos ||
+          //currentBB.find("sub_") != std::string::npos) {
+    //if (previousBB != currentBB) {
+      //llvm::errs() << "BB=^v=" << state.depth << ":" << currentBB << "\n";
+      //previousBB = currentBB;
+    //}
+  //}
 
   switch (i->getOpcode()) {
     // Control flow
