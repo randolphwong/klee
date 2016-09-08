@@ -112,6 +112,16 @@ using namespace klee;
 
 namespace {
   cl::opt<bool>
+  BugbenchSrcDump("test-bugbench-src",
+                   cl::init(false),
+		   cl::desc("Dump the function names and basic blocks traversed when executing bugbench programs to stderr (default=off)"));
+
+  cl::opt<bool>
+  BugbenchLiftedDump("test-bugbench-lifted",
+                   cl::init(false),
+		   cl::desc("Dump the function names and basic blocks traversed when executing lifted bugbench programs to stderr (default=off)"));
+
+  cl::opt<bool>
   DumpStatesOnHalt("dump-states-on-halt",
                    cl::init(true),
 		   cl::desc("Dump test cases for all active states on exit (default=on)"));
@@ -1830,44 +1840,48 @@ static inline const llvm::fltSemantics * fpWidthToSemantics(unsigned width) {
 void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
   Instruction *i = ki->inst;
 
-  std::map <std::string, int> function_list;
-  static BasicBlock *previousBB = i->getParent();
-  BasicBlock *currentBB = i->getParent();
-  std::string moduleName = currentBB->getParent()->getParent()->getModuleIdentifier();
-  if (moduleName.find("bc.bc") != std::string::npos)
+  if (BugbenchSrcDump) {
+    std::map <std::string, int> function_list;
+    static BasicBlock *previousBB = i->getParent();
+    BasicBlock *currentBB = i->getParent();
+    std::string moduleName = currentBB->getParent()->getParent()->getModuleIdentifier();
+    if (moduleName.find("bc") != std::string::npos)
       function_list = function_list_bc;
-  else if (moduleName.find("compress42.bc") != std::string::npos)
+    else if (moduleName.find("compress42") != std::string::npos)
       function_list = function_list_ncompress;
-  else if (moduleName.find("gzip.bc") != std::string::npos)
+    else if (moduleName.find("gzip") != std::string::npos)
       function_list = function_list_gzip;
-  else if (moduleName.find("polymorph.bc") != std::string::npos)
+    else if (moduleName.find("polymorph") != std::string::npos)
       function_list = function_list_poly;
-  else if (moduleName.find("man") != std::string::npos)
+    else if (moduleName.find("man") != std::string::npos)
       function_list = function_list_man;
-  else if (moduleName.find("mkdir") != std::string::npos)
+    else if (moduleName.find("mkdir") != std::string::npos)
       function_list = function_list_mkdir;
 
-  if (previousBB != currentBB) {
-    if (function_list.find(currentBB->getParent()->getName().str()) != function_list.end()) {
-      llvm::errs() << "function " << currentBB->getParent()->getName() << ": ";
-      llvm::errs() << "BB=^v=" << state.depth << ":" << currentBB << "-" << currentBB->getName() << "\n";
-      previousBB = currentBB;
+    if (previousBB != currentBB) {
+      if (function_list.find(currentBB->getParent()->getName().str()) != function_list.end()) {
+        llvm::errs() << "function " << currentBB->getParent()->getName() << ": ";
+        llvm::errs() << "BB=^v=" << state.depth << ":" << currentBB << "-" << currentBB->getName() << "\n";
+        previousBB = currentBB;
+      }
     }
   }
 
-  //static std::string previousBB = i->getParent()->getName().str();
-  //std::string currentBB = i->getParent()->getName().str();
+  if (BugbenchLiftedDump) {
+    static std::string previousBB = i->getParent()->getName().str();
+    std::string currentBB = i->getParent()->getName().str();
 
-  //if (currentBB.find("entry") != std::string::npos)
-      //currentBB = i->getParent()->getParent()->getName().str();
+    if (currentBB.find("entry") != std::string::npos)
+        currentBB = i->getParent()->getParent()->getName().str();
 
-  //if (currentBB.find("block_") != std::string::npos ||
-          //currentBB.find("sub_") != std::string::npos) {
-    //if (previousBB != currentBB) {
-      //llvm::errs() << "BB=^v=" << state.depth << ":" << currentBB << "\n";
-      //previousBB = currentBB;
-    //}
-  //}
+    if (currentBB.find("block_") != std::string::npos ||
+            currentBB.find("sub_") != std::string::npos) {
+      if (previousBB != currentBB) {
+        llvm::errs() << "BB=^v=" << state.depth << ":" << currentBB << "\n";
+        previousBB = currentBB;
+      }
+    }
+  }
 
   switch (i->getOpcode()) {
     // Control flow
