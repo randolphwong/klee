@@ -35,12 +35,25 @@ void klee_warning(const char*);
 void klee_warning_once(const char*);
 int klee_get_errno(void);
 
+char *basename(const char *pathname) {
+  char *base;
+
+  if (pathname == NULL)
+    return (char *) pathname;
+
+  if ( (base = strrchr(pathname, '/')) == NULL)
+    return (char *) pathname;
+
+  return base + 1;
+}
+
 /* Returns pointer to the symbolic file structure fs the pathname is symbolic */
 static exe_disk_file_t *__get_sym_file(const char *pathname) {
-  char c = pathname[0];
+  char *filename = basename(pathname);
+  char c = filename[0];
   unsigned i;
 
-  if (c == 0 || pathname[1] != 0)
+  if (c == 0 || filename[1] != 0)
     return NULL;
 
   for (i=0; i<__exe_fs.n_sym_files; ++i) {
