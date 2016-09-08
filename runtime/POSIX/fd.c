@@ -333,6 +333,24 @@ int close(int fd) {
 }
 
 /**
+ * Add constraints to all argv so that they are of length len.
+ */
+void force_max_len(int argc, char **argv, unsigned long len)
+{
+    unsigned long i;
+    char buf[80] = {0};
+
+    sprintf(buf, "forcing all argv to have length %lu\n", len);
+    klee_warning(buf);
+
+    while (--argc) {
+        for (i = 0; i < len; i++)
+            klee_assume(argv[argc][i] != '\0');
+        klee_assume(argv[argc][i] == '\0');
+    }
+}
+
+/**
  * returns concrete only if name is concrete and environment 
  * variable != "klee_make_symbolic"
  */
